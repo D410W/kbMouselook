@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required (VERSION 3.8)
-project ("Mouselook")
+project ("kbMouselook")
 
 # include(FetchContent)
 
@@ -15,7 +15,7 @@ set ( APP_NAME "kbmouselook" )
 set ( SRC_FOLDER "${CMAKE_SOURCE_DIR}/src" )
 set ( HEADER_FOLDER "${CMAKE_SOURCE_DIR}/src/headers" )
 # Ajoutez une source à l'exécutable de ce projet.
-add_executable ( ${APP_NAME} "${SRC_FOLDER}/mouselook.cpp"
+add_executable ( ${APP_NAME} "${SRC_FOLDER}/kbmouselook.cpp"
     "${HEADER_FOLDER}/hotkey_action.cpp" "${HEADER_FOLDER}/sendinput_funcs.cpp" )
 
 target_include_directories( ${APP_NAME} PRIVATE ${HEADER_FOLDER} )
