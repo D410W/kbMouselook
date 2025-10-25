@@ -7,7 +7,7 @@ Currently only has Windows support.
 
 ## Binds
 
-### Send mouse inputs
+### Send mouse actions
 
 Numpad 4, 5, 6, 8: Mouse movement (as in 'left', 'down', 'right', 'up').\
 [Modifiers]: 'CONTROL' speeds up, and 'ALT' slows down the cursor.
