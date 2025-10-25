@@ -10,6 +10,7 @@
 
 #include "headers/hotkey_action.hpp"
 #include "headers/sendinput_funcs.hpp"
+#include "headers/tray_icon.hpp"
 
 // --- Configuration ---
 const int MOUSE_SPEED = 10; // Pixels to move per interval
@@ -71,7 +72,7 @@ VOID CALLBACK HighResTimerProc(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD
   }
 
   float currentMultiplier = 1.0f;
-  bool slowHeld = (GetAsyncKeyState(VK_LMENU) & 0x8000) || (GetAsyncKeyState(VK_RSHIFT) & 0x8000);
+  bool slowHeld = (GetAsyncKeyState(VK_LMENU) & 0x8000) || (GetAsyncKeyState(VK_RMENU) & 0x8000);
   bool fastHeld = (GetAsyncKeyState(VK_LCONTROL) & 0x8000) || (GetAsyncKeyState(VK_RCONTROL) & 0x8000);
   if (fastHeld) { currentMultiplier = FAST_MULTIPLIER; }
   else if (slowHeld) { currentMultiplier = SLOW_MULTIPLIER; }
@@ -135,11 +136,11 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     bool handled = false;
 
     // Check for Escape key to exit
-    if (vkCode == VK_DELETE && isKeyDown) {
-      std::cout << "Escape pressed. Exiting..." << std::endl;
-      PostQuitMessage(0); // Signal the message loop to terminate
-      return 1; // Block Escape key
-    }
+    // if (vkCode == VK_DELETE && isKeyDown) {
+    //   std::cout << "DELETE pressed. Exiting..." << std::endl;
+    //   PostQuitMessage(0); // Signal the message loop to terminate
+    //   return 1; // Block DELETE key
+    // }
 
     // --- Check Action Map (NEW SECTION) ---
     for (const auto& hk : actionMap) {
@@ -178,33 +179,58 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 }
 
 int main() {
+  #ifndef _DEBUG
     FreeConsole();
+  #endif
 
-    // Request a higher timer resolution (e.g., 1ms)
-    if (timeBeginPeriod(1) != TIMERR_NOERROR) {
-      std::cerr << "Warning: Could not set high timer resolution." << std::endl;
-    }
+  // ======= Initializing tray icon =======
+  g_hInstance = GetModuleHandle(NULL); // Get instance handle
 
-    std::cout << "Starting Numpad Mouse..." << std::endl;
-    g_keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, GetModuleHandle(NULL), 0);
-    // ... (error check) ...
+  // --- Hide Console Window ---
+  ShowWindow(GetConsoleWindow(), SW_HIDE);
 
-    MSG msg;
-    while (GetMessage(&msg, NULL, 0, 0)) {
-      TranslateMessage(&msg);
-      DispatchMessage(&msg);
-    }
+  // --- Register Hidden Window Class ---
+  WNDCLASS wc = { 0 };
+  wc.lpfnWndProc = WndProc;
+  wc.hInstance = g_hInstance;
+  wc.lpszClassName = TEXT("HiddenWindowClass");
+  RegisterClass(&wc);
 
-    // --- Cleanup ---
-    if (g_keyboardHook != NULL) {
-      UnhookWindowsHookEx(g_keyboardHook);
-    }
-    if (g_timerID != 0) { // Kill timer if it was still running
-      timeKillEvent(g_timerID);
-    }
-    timeEndPeriod(1); // Release the timer resolution request
-    // --- End Cleanup ---
+  g_hHiddenWnd = CreateWindowEx(
+    0, wc.lpszClassName, TEXT("Hidden Window"), 0,
+    0, 0, 0, 0, HWND_MESSAGE, NULL, g_hInstance, NULL);
 
-    std::cout << "Numpad Mouse stopped." << std::endl;
-    return 0;
+  if (!g_hHiddenWnd) return -1; // Failed
+
+  AddTrayIcon(g_hHiddenWnd);
+  // ======= Initializing tray icon =======
+
+  // Request a higher timer resolution (e.g., 1ms)
+  if (timeBeginPeriod(1) != TIMERR_NOERROR) {
+    std::cerr << "Warning: Could not set high timer resolution." << std::endl;
+  }
+
+  std::cout << "Starting Numpad Mouse..." << std::endl;
+
+  g_keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, GetModuleHandle(NULL), 0);
+  // ... (error check) ...
+
+  MSG msg;
+  while (GetMessage(&msg, NULL, 0, 0)) {
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+  }
+
+  // --- Cleanup ---
+  if (g_keyboardHook != NULL) {
+    UnhookWindowsHookEx(g_keyboardHook);
+  }
+  if (g_timerID != 0) { // Kill timer if it was still running
+    timeKillEvent(g_timerID);
+  }
+  timeEndPeriod(1); // Release the timer resolution request
+  // --- End Cleanup ---
+
+  std::cout << "Numpad Mouse stopped." << std::endl;
+  return (int)msg.wParam;
 }

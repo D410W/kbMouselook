@@ -24,6 +24,10 @@ if(WIN32)
     target_link_libraries(${APP_NAME} PRIVATE Winmm)
 endif()
 
+if(MSVC)
+    target_sources(${APP_NAME} PRIVATE "${SRC_FOLDER}/resources/resources.rc")
+endif()
+
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ${APP_NAME} PROPERTY CXX_STANDARD 20)
 endif()

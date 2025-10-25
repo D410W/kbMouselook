@@ -1,0 +1,5 @@
+#include "../headers/resource.h" // Include the header you just made
+
+// IDI_MYICON ICON "path/to/your/myapp.ico"
+// Uses a relative path from the .rc file to the icon, or an absolute path.
+IDI_MYICON ICON "myapp.ico"
