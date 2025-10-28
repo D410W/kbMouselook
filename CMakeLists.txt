@@ -1,15 +1,8 @@
-﻿cmake_minimum_required (VERSION 3.8)
-project ("kbMouselook")
+cmake_minimum_required (VERSION 3.8)
+project ("kbMouselook" VERSION 1.0)
 
-# include(FetchContent)
-
-# FetchContent_Declare(
-#     MyExternalLib
-#     GIT_REPOSITORY https://github.com/user/myexternallib.git
-#     GIT_TAG v1.0.0 # Or a specific commit hash
-# )
-
-# FetchContent_MakeAvailable(MyExternalLib)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set ( APP_NAME "kbmouselook" )
 set ( SRC_FOLDER "${CMAKE_SOURCE_DIR}/src" )
@@ -18,8 +11,8 @@ set ( HEADER_FOLDER "${CMAKE_SOURCE_DIR}/src/headers" )
 add_executable ( ${APP_NAME} "${SRC_FOLDER}/kbmouselook.cpp"
     "${HEADER_FOLDER}/hotkey_action.cpp" "${HEADER_FOLDER}/sendinput_funcs.cpp" )
 
-target_include_directories( ${APP_NAME} PRIVATE ${HEADER_FOLDER} )
-# target_link_libraries ( ${APP_NAME} PRIVATE MyExternalLib::target_name )
+target_include_directories( ${APP_NAME} PRIVATE ${HEADER_FOLDER}00 )
+
 if(WIN32)
     target_link_libraries(${APP_NAME} PRIVATE Winmm)
 endif()

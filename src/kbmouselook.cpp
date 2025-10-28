@@ -1,11 +1,11 @@
-﻿#define WINVER 0x0500 // Required for SendInput
+#define WINVER 0x0500 // Required for SendInput
 #include <iostream>
 #include <map>
 #include <vector>
 #include <array>
 #include <chrono>
 
-#include <windows.h>
+// #include <windows.h>
 #include <mmsystem.h> // For multimedia timers
 
 #include "headers/hotkey_action.hpp"
